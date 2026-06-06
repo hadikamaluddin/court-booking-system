@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | IIUM Sports Court Booking</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="admin-dashboard">
+  <header class="site-header">
+    <nav class="navbar container" aria-label="Main navigation">
+      <a class="brand" href="index.html"><span class="brand-mark">IB</span><span>IIUM Sports Court Booking</span></a>
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false">Menu</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="courts.html">Courts</a>
+        <a href="booking.html">Book</a>
+        <a href="my-bookings.html">My Bookings</a>
+        <a href="admin-dashboard.html">Admin</a>
+        <a href="login.html" class="btn btn-small">Login</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="page-main">
+    <section class="container">
+      <div class="page-heading split-heading">
+        <div>
+          <p class="eyebrow">Admin area</p>
+          <h1>Dashboard</h1>
+          <p class="muted">Simple overview for court and booking management.</p>
+        </div>
+        <div class="button-row">
+          <a href="manage-courts.html" class="btn btn-secondary">Manage Courts</a>
+          <a href="manage-bookings.html" class="btn btn-primary">Manage Bookings</a>
+        </div>
+      </div>
+
+      <div class="summary-grid" id="adminSummary"></div>
+
+      <section class="section-card">
+        <div class="section-heading compact">
+          <h2>Recent Bookings</h2>
+          <p class="muted">Latest booking records from localStorage.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>User</th>
+                <th>Court</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Payment</th>
+              </tr>
+            </thead>
+            <tbody id="recentBookingsTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>&copy; 2026 IIUM Sports Court Booking</p>
+      <p>Admin prototype view.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

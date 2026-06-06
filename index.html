@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IIUM Sports Court Booking</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="home">
+  <header class="site-header">
+    <nav class="navbar container" aria-label="Main navigation">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">IB</span>
+        <span>IIUM Sports Court Booking</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false">Menu</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="courts.html">Courts</a>
+        <a href="booking.html">Book</a>
+        <a href="my-bookings.html">My Bookings</a>
+        <a href="admin-dashboard.html">Admin</a>
+        <a href="login.html" class="btn btn-small">Login</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-image" role="img" aria-label="Campus sports courts"></div>
+      <div class="hero-overlay"></div>
+      <div class="container hero-content">
+        <p class="eyebrow">Campus Court Booking</p>
+        <h1>Book IIUM sports courts without the usual back and forth.</h1>
+        <p>Check court availability, choose your time slot, and keep track of your bookings in one simple place.</p>
+        <div class="button-row">
+          <a href="courts.html" class="btn btn-primary">View Courts</a>
+          <a href="booking.html" class="btn btn-secondary">Book Now</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container two-column">
+        <div>
+          <p class="eyebrow">For students and staff</p>
+          <h2>A simple system for daily court reservations</h2>
+          <p class="muted">This frontend is prepared for a future Flask and Oracle backend. For now, it uses mock data and localStorage so the booking flow can be tested from start to finish.</p>
+        </div>
+        <div class="notice-box">
+          <h3>Current booking rate</h3>
+          <p><strong>RM10 per hour</strong> for every available court.</p>
+          <p class="muted small">Payment status is mocked for the prototype and can be linked to the PAYMENT table later.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Court types</p>
+          <h2>Sports listed in the system</h2>
+          <p class="muted">Only Badminton, Futsal, Tennis, and Netball have court records in this prototype.</p>
+        </div>
+        <div class="type-grid" id="homeCourtTypes"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>&copy; 2026 IIUM Sports Court Booking</p>
+      <p>Prototype frontend for USERS, COURT_TYPE, COURT, BOOKING, and PAYMENT modules.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

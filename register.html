@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | IIUM Sports Court Booking</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="register">
+  <header class="site-header">
+    <nav class="navbar container" aria-label="Main navigation">
+      <a class="brand" href="index.html"><span class="brand-mark">IB</span><span>IIUM Sports Court Booking</span></a>
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false">Menu</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="courts.html">Courts</a>
+        <a href="booking.html">Book</a>
+        <a href="my-bookings.html">My Bookings</a>
+        <a href="admin-dashboard.html">Admin</a>
+        <a href="login.html" class="btn btn-small">Login</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="page-main">
+    <section class="container form-page">
+      <div class="form-intro">
+        <p class="eyebrow">Student registration</p>
+        <h1>Create a user account</h1>
+        <p class="muted">This form creates a mock USER record in localStorage. A student ID is generated automatically for the prototype.</p>
+      </div>
+      <form class="form-card" id="registerForm">
+        <div class="form-message" id="registerMessage" aria-live="polite"></div>
+        <label for="fullName">Full Name</label>
+        <input type="text" id="fullName" name="fullName" placeholder="Enter full name" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="name@student.iium.edu.my" required>
+
+        <label for="phoneNo">Phone Number</label>
+        <input type="tel" id="phoneNo" name="phoneNo" placeholder="0123456789" required pattern="[0-9+\-\s]{9,15}">
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="At least 6 characters" required minlength="6">
+
+        <button type="submit" class="btn btn-primary full-width">Register</button>
+        <p class="form-note">Already registered? <a href="login.html">Go to login</a></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>&copy; 2026 IIUM Sports Court Booking</p>
+      <p>Prepared for the future USERS table.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

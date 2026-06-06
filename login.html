@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | IIUM Sports Court Booking</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="login">
+  <header class="site-header">
+    <nav class="navbar container" aria-label="Main navigation">
+      <a class="brand" href="index.html"><span class="brand-mark">IB</span><span>IIUM Sports Court Booking</span></a>
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false">Menu</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="courts.html">Courts</a>
+        <a href="booking.html">Book</a>
+        <a href="my-bookings.html">My Bookings</a>
+        <a href="admin-dashboard.html">Admin</a>
+        <a href="login.html" class="btn btn-small">Login</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="page-main">
+    <section class="container form-page">
+      <div class="form-intro">
+        <p class="eyebrow">Mock login</p>
+        <h1>Sign in to continue</h1>
+        <p class="muted">Use student ID <strong>U001</strong> with password <strong>student123</strong>, or choose admin login and use password <strong>admin123</strong>.</p>
+      </div>
+      <form class="form-card" id="loginForm">
+        <div class="form-message" id="loginMessage" aria-live="polite"></div>
+        <label for="loginId">Student ID or Email</label>
+        <input type="text" id="loginId" name="loginId" placeholder="U001" required>
+
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" name="loginPassword" placeholder="Enter password" required minlength="6">
+
+        <label class="check-row">
+          <input type="checkbox" id="adminLogin">
+          <span>Login as admin</span>
+        </label>
+
+        <button type="submit" class="btn btn-primary full-width">Login</button>
+        <p class="form-note">No real authentication yet. This page only stores the current mock user in localStorage.</p>
+        <p class="form-note">New student? <a href="register.html">Create an account</a></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>&copy; 2026 IIUM Sports Court Booking</p>
+      <p>Mock authentication for frontend testing.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

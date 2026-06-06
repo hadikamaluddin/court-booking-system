@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Courts | IIUM Sports Court Booking</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="courts">
+  <header class="site-header">
+    <nav class="navbar container" aria-label="Main navigation">
+      <a class="brand" href="index.html"><span class="brand-mark">IB</span><span>IIUM Sports Court Booking</span></a>
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false">Menu</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="courts.html">Courts</a>
+        <a href="booking.html">Book</a>
+        <a href="my-bookings.html">My Bookings</a>
+        <a href="admin-dashboard.html">Admin</a>
+        <a href="login.html" class="btn btn-small">Login</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="page-main">
+    <section class="container">
+      <div class="page-heading">
+        <p class="eyebrow">Court list</p>
+        <h1>Choose a court type</h1>
+        <p class="muted">Badminton, Futsal, Tennis, and Netball have courts available in this prototype. Other sports are listed for future setup.</p>
+      </div>
+
+      <div class="filter-tabs" id="courtTypeFilters"></div>
+      <div class="card-grid" id="courtCards"></div>
+      <div class="empty-state hidden" id="noCourtsMessage">
+        <h2>No courts available yet</h2>
+        <p>This sport is already listed in COURT_TYPE, but no COURT records have been added for it.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>&copy; 2026 IIUM Sports Court Booking</p>
+      <p>Court rate: RM10 per hour.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Court | IIUM Sports Court Booking</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="booking">
+  <header class="site-header">
+    <nav class="navbar container" aria-label="Main navigation">
+      <a class="brand" href="index.html"><span class="brand-mark">IB</span><span>IIUM Sports Court Booking</span></a>
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false">Menu</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="courts.html">Courts</a>
+        <a href="booking.html">Book</a>
+        <a href="my-bookings.html">My Bookings</a>
+        <a href="admin-dashboard.html">Admin</a>
+        <a href="login.html" class="btn btn-small">Login</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="page-main">
+    <section class="container form-page wide-form">
+      <div class="form-intro">
+        <p class="eyebrow">New booking</p>
+        <h1>Reserve a court</h1>
+        <p class="muted">Select an available court, date, start time, and duration. The total is calculated automatically at RM10 per hour.</p>
+        <div class="booking-summary-box">
+          <span>Booking as</span>
+          <strong id="bookingUserLabel">U001</strong>
+        </div>
+      </div>
+
+      <form class="form-card" id="bookingForm">
+        <div class="form-message" id="bookingMessage" aria-live="polite"></div>
+
+        <label for="courtSelect">Court</label>
+        <select id="courtSelect" name="courtSelect" required></select>
+
+        <div class="form-row">
+          <div>
+            <label for="bookingDate">Date</label>
+            <input type="date" id="bookingDate" name="bookingDate" required>
+          </div>
+          <div>
+            <label for="startTime">Start Time</label>
+            <select id="startTime" name="startTime" required>
+              <option value="">Choose time</option>
+              <option value="08:00">08:00 AM</option>
+              <option value="09:00">09:00 AM</option>
+              <option value="10:00">10:00 AM</option>
+              <option value="11:00">11:00 AM</option>
+              <option value="14:00">02:00 PM</option>
+              <option value="15:00">03:00 PM</option>
+              <option value="16:00">04:00 PM</option>
+              <option value="17:00">05:00 PM</option>
+              <option value="20:00">08:00 PM</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="duration">Duration</label>
+        <select id="duration" name="duration" required>
+          <option value="1">1 hour</option>
+          <option value="2">2 hours</option>
+          <option value="3">3 hours</option>
+        </select>
+
+        <div class="price-panel">
+          <span>Total Price</span>
+          <strong id="totalPrice">RM10</strong>
+        </div>
+
+        <button type="submit" class="btn btn-primary full-width">Submit Booking</button>
+        <p class="form-note">Booking status starts as Pending and payment status starts as Unpaid.</p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>&copy; 2026 IIUM Sports Court Booking</p>
+      <p>Prepared for BOOKING and PAYMENT records.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
