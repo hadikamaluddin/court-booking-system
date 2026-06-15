@@ -1,0 +1,288 @@
+---------------------- TASK 7 PROCEDURES ----------------------
+-- These procedures are used to add a booking and update booking status.
+-- The Add_New_Booking procedure inserts into BOOKING only.
+-- PAYMENT is still handled using the existing PAYMENT table, not a new column.
+
+SET SERVEROUTPUT ON;
+
+---------------------- PROCEDURE 1 ----------------------
+CREATE OR REPLACE PROCEDURE Add_New_Booking
+(
+    p_BookingID   IN BOOKING.BookingID%TYPE,
+    p_UserID      IN BOOKING.UserID%TYPE,
+    p_CourtID     IN BOOKING.CourtID%TYPE,
+    p_BookingDate IN BOOKING.BookingDate%TYPE,
+    p_StartTime   IN BOOKING.StartTime%TYPE,
+    p_EndTime     IN BOOKING.EndTime%TYPE
+)
+AS
+    v_BookingID BOOKING.BookingID%TYPE;
+    v_UserID    BOOKING.UserID%TYPE;
+    v_CourtID   BOOKING.CourtID%TYPE;
+    v_StartTime BOOKING.StartTime%TYPE;
+    v_EndTime   BOOKING.EndTime%TYPE;
+    v_Count     NUMBER;
+BEGIN
+    v_BookingID := UPPER(TRIM(p_BookingID));
+    v_UserID    := UPPER(TRIM(p_UserID));
+    v_CourtID   := UPPER(TRIM(p_CourtID));
+    v_StartTime := TRIM(p_StartTime);
+    v_EndTime   := TRIM(p_EndTime);
+
+    -- Check whether BookingID already exists.
+    SELECT COUNT(*)
+    INTO v_Count
+    FROM BOOKING
+    WHERE BookingID = v_BookingID;
+
+    IF v_Count > 0 THEN
+        RAISE_APPLICATION_ERROR(
+            -20001,
+            'Booking ID already exists.'
+        );
+    END IF;
+
+    -- Check whether user exists.
+    SELECT COUNT(*)
+    INTO v_Count
+    FROM USERS
+    WHERE UserID = v_UserID;
+
+    IF v_Count = 0 THEN
+        RAISE_APPLICATION_ERROR(
+            -20002,
+            'User ID does not exist.'
+        );
+    END IF;
+
+    -- Check whether court exists and is available.
+    SELECT COUNT(*)
+    INTO v_Count
+    FROM COURT
+    WHERE CourtID = v_CourtID
+      AND CourtStatus = 'Available';
+
+    IF v_Count = 0 THEN
+        RAISE_APPLICATION_ERROR(
+            -20003,
+            'Court does not exist or is not available.'
+        );
+    END IF;
+
+    -- End time must be later than start time.
+    -- The time should be entered in HH24:MI format, for example 08:00.
+    IF TO_DATE(v_EndTime, 'HH24:MI')
+       <= TO_DATE(v_StartTime, 'HH24:MI') THEN
+
+        RAISE_APPLICATION_ERROR(
+            -20004,
+            'End time must be later than start time.'
+        );
+    END IF;
+
+    -- Check for overlapping bookings.
+    SELECT COUNT(*)
+    INTO v_Count
+    FROM BOOKING
+    WHERE CourtID = v_CourtID
+      AND TRUNC(BookingDate) = TRUNC(p_BookingDate)
+      AND BookingStatus IN ('Pending', 'Confirmed')
+      AND v_StartTime < EndTime
+      AND v_EndTime > StartTime;
+
+    IF v_Count > 0 THEN
+        RAISE_APPLICATION_ERROR(
+            -20006,
+            'The court is already booked during this time.'
+        );
+    END IF;
+
+    -- Insert new booking.
+    INSERT INTO BOOKING
+    (
+        BookingID,
+        UserID,
+        CourtID,
+        BookingDate,
+        StartTime,
+        EndTime,
+        BookingStatus
+    )
+    VALUES
+    (
+        v_BookingID,
+        v_UserID,
+        v_CourtID,
+        p_BookingDate,
+        v_StartTime,
+        v_EndTime,
+        'Pending'
+    );
+
+    DBMS_OUTPUT.PUT_LINE(
+        'Booking ' || v_BookingID || ' was added successfully for user ' ||
+        v_UserID || '.'
+    );
+END;
+/
+
+---------------------- CALL PROCEDURE 1 ----------------------
+-- Run this section using F5 / Run Script.
+-- Enter a new Booking ID, existing User ID, existing Court ID,
+-- booking date, start time, and end time when SQL Developer asks.
+
+ACCEPT p_booking_id CHAR PROMPT 'Enter Booking ID: '
+ACCEPT p_user_id CHAR PROMPT 'Enter User ID: '
+ACCEPT p_court_id CHAR PROMPT 'Enter Court ID: '
+ACCEPT p_booking_date CHAR PROMPT 'Enter Booking Date (YYYY-MM-DD): '
+ACCEPT p_start_time CHAR PROMPT 'Enter Start Time (HH24:MI): '
+ACCEPT p_end_time CHAR PROMPT 'Enter End Time (HH24:MI): '
+
+BEGIN
+    Add_New_Booking
+    (
+        p_BookingID   => '&p_booking_id',
+        p_UserID      => '&p_user_id',
+        p_CourtID     => '&p_court_id',
+        p_BookingDate => TO_DATE('&p_booking_date', 'YYYY-MM-DD'),
+        p_StartTime   => '&p_start_time',
+        p_EndTime     => '&p_end_time'
+    );
+END;
+/
+
+COMMIT;
+
+---------------------- CHECK PROCEDURE 1 RESULT ----------------------
+SELECT BookingID,
+       UserID,
+       CourtID,
+       BookingDate,
+       StartTime,
+       EndTime,
+       BookingStatus
+FROM BOOKING
+WHERE BookingID = UPPER(TRIM('&p_booking_id'));
+
+---------------------- PROCEDURE 2 ----------------------
+CREATE OR REPLACE PROCEDURE Update_Booking_Status
+(
+    p_BookingID IN BOOKING.BookingID%TYPE,
+    p_NewStatus IN BOOKING.BookingStatus%TYPE
+)
+AS
+    v_BookingID     BOOKING.BookingID%TYPE;
+    v_Status        BOOKING.BookingStatus%TYPE;
+    v_PaymentStatus PAYMENT.PaymentStatus%TYPE;
+    v_Count         NUMBER;
+BEGIN
+    v_BookingID := UPPER(TRIM(p_BookingID));
+    v_Status    := INITCAP(TRIM(p_NewStatus));
+
+    -- Validate booking status.
+    IF v_Status NOT IN
+       ('Pending', 'Confirmed', 'Cancelled', 'Completed') THEN
+
+        RAISE_APPLICATION_ERROR(
+            -20007,
+            'Invalid status. Use Pending, Confirmed, Cancelled, or Completed.'
+        );
+    END IF;
+
+    -- Check whether booking exists.
+    SELECT COUNT(*)
+    INTO v_Count
+    FROM BOOKING
+    WHERE BookingID = v_BookingID;
+
+    IF v_Count = 0 THEN
+        RAISE_APPLICATION_ERROR(
+            -20008,
+            'Booking ID does not exist.'
+        );
+    END IF;
+
+    -- Paid bookings cannot be cancelled.
+    IF v_Status = 'Cancelled' THEN
+        SELECT NVL(MAX(PaymentStatus), 'Unpaid')
+        INTO v_PaymentStatus
+        FROM PAYMENT
+        WHERE BookingID = v_BookingID;
+
+        IF v_PaymentStatus IN ('Paid', 'Refunded') THEN
+            RAISE_APPLICATION_ERROR(
+                -20012,
+                'Paid bookings cannot be cancelled.'
+            );
+        END IF;
+    END IF;
+
+    UPDATE BOOKING
+    SET BookingStatus = v_Status
+    WHERE BookingID = v_BookingID;
+
+    -- If a payment row already exists, mark it as cancelled too.
+    -- This uses the existing PAYMENT.PaymentStatus column.
+    IF v_Status = 'Cancelled' THEN
+        UPDATE PAYMENT
+        SET PaymentStatus = 'Cancelled'
+        WHERE BookingID = v_BookingID
+          AND PaymentStatus <> 'Paid';
+    END IF;
+
+    DBMS_OUTPUT.PUT_LINE(
+        'Booking ' || v_BookingID ||
+        ' status was updated to ' || v_Status || '.'
+    );
+END;
+/
+
+---------------------- CALL PROCEDURE 2 ----------------------
+-- Run this section using F5 / Run Script.
+
+ACCEPT p_update_booking_id CHAR PROMPT 'Enter Booking ID to update: '
+ACCEPT p_new_status CHAR PROMPT 'Enter New Status (Pending/Confirmed/Cancelled/Completed): '
+
+BEGIN
+    Update_Booking_Status
+    (
+        p_BookingID => '&p_update_booking_id',
+        p_NewStatus => '&p_new_status'
+    );
+END;
+/
+
+COMMIT;
+
+---------------------- CHECK PROCEDURE 2 RESULT ----------------------
+SELECT b.BookingID,
+       b.UserID,
+       b.CourtID,
+       b.BookingDate,
+       b.StartTime,
+       b.EndTime,
+       b.BookingStatus,
+       p.PaymentMethod,
+       p.PaymentStatus
+FROM BOOKING b
+LEFT JOIN PAYMENT p
+  ON b.BookingID = p.BookingID
+WHERE b.BookingID = UPPER(TRIM('&p_update_booking_id'));
+
+---------------------- CHECK PROCEDURE STATUS ----------------------
+SELECT ObjectName,
+       ObjectType,
+       Status
+FROM
+(
+    SELECT OBJECT_NAME AS ObjectName,
+           OBJECT_TYPE AS ObjectType,
+           STATUS AS Status
+    FROM USER_OBJECTS
+)
+WHERE ObjectName IN
+(
+    'ADD_NEW_BOOKING',
+    'UPDATE_BOOKING_STATUS'
+)
+ORDER BY ObjectType, ObjectName;

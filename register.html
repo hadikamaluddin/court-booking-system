@@ -25,27 +25,16 @@
   <main class="page-main">
     <section class="container form-page">
       <div class="form-intro">
-        <p class="eyebrow">Student registration</p>
-        <h1>Create a user account</h1>
-        <p class="muted">This form creates a mock USER record in localStorage. A student ID is generated automatically for the prototype.</p>
+        <p class="eyebrow">Clerk registration</p>
+        <h1>Create a student account</h1>
+        <p class="muted">Registration now uses Clerk email and password authentication. After sign up, the frontend creates a local mock USER record so bookings can still connect to a student ID.</p>
       </div>
-      <form class="form-card" id="registerForm">
-        <div class="form-message" id="registerMessage" aria-live="polite"></div>
-        <label for="fullName">Full Name</label>
-        <input type="text" id="fullName" name="fullName" placeholder="Enter full name" required>
-
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="name@student.iium.edu.my" required>
-
-        <label for="phoneNo">Phone Number</label>
-        <input type="tel" id="phoneNo" name="phoneNo" placeholder="0123456789" required pattern="[0-9+\-\s]{9,15}">
-
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="At least 6 characters" required minlength="6">
-
-        <button type="submit" class="btn btn-primary full-width">Register</button>
+      <section class="form-card clerk-card" aria-labelledby="studentRegisterTitle">
+        <h2 id="studentRegisterTitle">Student Registration</h2>
+        <div class="form-message" id="clerkSetupMessage" aria-live="polite"></div>
+        <div id="clerkSignUp" class="clerk-mount"></div>
         <p class="form-note">Already registered? <a href="login.html">Go to login</a></p>
-      </form>
+      </section>
     </section>
   </main>
 
@@ -56,6 +45,7 @@
     </div>
   </footer>
 
+  <script src="js/clerk-config.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

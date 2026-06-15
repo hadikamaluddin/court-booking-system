@@ -1,0 +1,159 @@
+---------------------- TASK 8 FUNCTIONS ----------------------
+
+CREATE OR REPLACE FUNCTION Calculate_Booking_Amount
+(
+    p_BookingID IN BOOKING.BookingID%TYPE
+)
+RETURN NUMBER
+AS
+    v_StartTime     BOOKING.StartTime%TYPE;
+    v_EndTime       BOOKING.EndTime%TYPE;
+    v_BookingStatus BOOKING.BookingStatus%TYPE;
+    v_PaymentStatus PAYMENT.PaymentStatus%TYPE;
+    v_PricePerHour  COURT.PricePerHour%TYPE;
+    v_TotalHours    NUMBER;
+    v_TotalAmount   NUMBER(8,2);
+BEGIN
+    SELECT b.StartTime,
+           b.EndTime,
+           b.BookingStatus,
+           NVL(p.PaymentStatus, 'Unpaid'),
+           c.PricePerHour
+    INTO v_StartTime,
+         v_EndTime,
+         v_BookingStatus,
+         v_PaymentStatus,
+         v_PricePerHour
+    FROM BOOKING b
+    JOIN COURT c
+      ON b.CourtID = c.CourtID
+    LEFT JOIN PAYMENT p
+      ON b.BookingID = p.BookingID
+    WHERE b.BookingID = p_BookingID;
+
+    -- Cancelled bookings should not show an amount the user still needs to pay.
+    IF v_BookingStatus = 'Cancelled'
+       OR v_PaymentStatus IN ('Cancelled', 'Refunded') THEN
+        RETURN 0;
+    END IF;
+
+    -- Calculate booking duration in hours.
+    v_TotalHours :=
+        (
+            TO_DATE(v_EndTime, 'HH24:MI')
+            - TO_DATE(v_StartTime, 'HH24:MI')
+        ) * 24;
+
+    IF v_TotalHours <= 0 THEN
+        RAISE_APPLICATION_ERROR(
+            -20009,
+            'Invalid booking duration.'
+        );
+    END IF;
+
+    v_TotalAmount :=
+        ROUND(v_TotalHours * v_PricePerHour, 2);
+
+    RETURN v_TotalAmount;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(
+            -20010,
+            'Booking ID does not exist.'
+        );
+END;
+/
+
+------------ CALL FUNCTION 1
+SET SERVEROUTPUT ON;
+
+ACCEPT p_booking_id CHAR PROMPT 'Enter Booking ID: '
+
+DECLARE
+    v_BookingID BOOKING.BookingID%TYPE := UPPER(TRIM('&p_booking_id'));
+    v_Amount    NUMBER(8,2);
+BEGIN
+    v_Amount := Calculate_Booking_Amount(v_BookingID);
+
+    DBMS_OUTPUT.PUT_LINE(
+        'Total amount for booking ' ||
+        v_BookingID ||
+        ': RM ' ||
+        TO_CHAR(v_Amount, 'FM9990.00')
+    );
+END;
+/
+
+----------- FUNCTION 2
+CREATE OR REPLACE FUNCTION Count_User_Bookings
+(
+    p_UserID IN USERS.UserID%TYPE
+)
+RETURN NUMBER
+AS
+    v_UserExists    NUMBER;
+    v_TotalBookings NUMBER;
+BEGIN
+    -- Check whether user exists.
+    SELECT COUNT(*)
+    INTO v_UserExists
+    FROM USERS
+    WHERE UserID = p_UserID;
+
+    IF v_UserExists = 0 THEN
+        RAISE_APPLICATION_ERROR(
+            -20011,
+            'User ID does not exist.'
+        );
+    END IF;
+
+    -- Count all bookings made by the user.
+    SELECT COUNT(*)
+    INTO v_TotalBookings
+    FROM BOOKING
+    WHERE UserID = p_UserID;
+
+    RETURN v_TotalBookings;
+END;
+/
+
+---------- CALL FUNCTION 2
+SET SERVEROUTPUT ON;
+
+ACCEPT p_user_id CHAR PROMPT 'Enter User ID: '
+
+DECLARE
+    v_UserID        USERS.UserID%TYPE := UPPER(TRIM('&p_user_id'));
+    v_TotalBookings NUMBER;
+BEGIN
+    v_TotalBookings := Count_User_Bookings(v_UserID);
+
+    DBMS_OUTPUT.PUT_LINE(
+        'Total bookings made by ' ||
+        v_UserID ||
+        ': ' ||
+        v_TotalBookings
+    );
+END;
+/
+
+-------------------------- CHECK
+SELECT ObjectName,
+       ObjectType,
+       Status
+FROM
+(
+    SELECT OBJECT_NAME AS ObjectName,
+           OBJECT_TYPE AS ObjectType,
+           STATUS AS Status
+    FROM USER_OBJECTS
+)
+WHERE ObjectName IN
+(
+    'ADD_NEW_BOOKING',
+    'UPDATE_BOOKING_STATUS',
+    'CALCULATE_BOOKING_AMOUNT',
+    'COUNT_USER_BOOKINGS'
+)
+ORDER BY ObjectType, ObjectName;

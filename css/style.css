@@ -154,6 +154,12 @@ img {
   border-color: #e4b7b7;
 }
 
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
 .button-row {
   display: flex;
   flex-wrap: wrap;
@@ -394,6 +400,43 @@ img {
 
 .form-card h2 {
   margin-top: 0;
+}
+
+.auth-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.auth-note {
+  margin-top: 18px;
+}
+
+.auth-note h2,
+.admin-demo-card h2,
+.clerk-card h2 {
+  margin-top: 0;
+  font-size: 1.18rem;
+}
+
+.clerk-mount {
+  min-height: 180px;
+}
+
+.clerk-loading,
+.clerk-setup {
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: #fbfdfb;
+  padding: 16px;
+  color: var(--muted);
+}
+
+.nav-user-button {
+  min-width: 36px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 label {

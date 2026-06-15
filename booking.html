@@ -69,13 +69,21 @@
           <option value="3">3 hours</option>
         </select>
 
+        <label for="paymentMethod">Payment Method</label>
+        <select id="paymentMethod" name="paymentMethod" required>
+          <option value="">Choose payment method</option>
+          <option value="Cash">Cash</option>
+          <option value="Online Banking">Online Banking</option>
+          <option value="QR Pay">QR Pay</option>
+        </select>
+
         <div class="price-panel">
           <span>Total Price</span>
           <strong id="totalPrice">RM10</strong>
         </div>
 
         <button type="submit" class="btn btn-primary full-width">Submit Booking</button>
-        <p class="form-note">Booking status starts as Pending and payment status starts as Unpaid.</p>
+        <p class="form-note">Booking status starts as Pending and payment status starts as Unpaid. The selected payment method is saved for the payment record.</p>
       </form>
     </section>
   </main>
@@ -87,6 +95,7 @@
     </div>
   </footer>
 
+  <script src="js/clerk-config.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
