@@ -1,0 +1,309 @@
+-- =========================================================
+-- TASK 6: SQL QUERIES FOR COURT BOOKING SYSTEM
+-- Purpose: Query, insert, update and delete data.
+-- Extra: Check court availability by selected date and time.
+-- =========================================================
+
+-- =========================================================
+-- A. SELECT STATEMENTS
+-- =========================================================
+
+-- 1. List all users
+SELECT UserID,
+       FullName,
+       Email,
+       PhoneNo
+FROM USERS
+ORDER BY UserID;
+
+
+-- 2. List all court types
+SELECT CourtTypeID,
+       TypeName
+FROM COURT_TYPE
+ORDER BY CourtTypeID;
+
+
+-- 3. List all courts with court type and price
+SELECT c.CourtID,
+       c.CourtName,
+       ct.TypeName AS CourtType,
+       c.Location,
+       c.CourtStatus,
+       c.PricePerHour
+FROM COURT c
+JOIN COURT_TYPE ct
+ON c.CourtTypeID = ct.CourtTypeID
+ORDER BY ct.TypeName, c.Location, c.CourtName;
+
+
+-- 4A. Find the UserID for a real website/Clerk user first
+-- Example: hadikamaluddin logs in through the website, but Oracle stores him as U011.
+SELECT UserID,
+       FullName,
+       Email,
+       PhoneNo
+FROM USERS
+WHERE LOWER(FullName) LIKE '%hadikamaluddin%'
+   OR LOWER(Email) LIKE '%hadikamaluddin%';
+
+
+-- 4B. List all bookings made by one user
+-- Use the UserID found from query 4A.
+-- Example: hadikamaluddin = U011 in the current database.
+SELECT b.BookingID,
+       u.UserID,
+       u.FullName,
+       c.CourtName,
+       b.BookingDate,
+       b.StartTime,
+       b.EndTime,
+       b.BookingStatus,
+       p.PaymentMethod,
+       p.PaymentStatus,
+       p.Amount
+FROM BOOKING b
+JOIN USERS u
+ON b.UserID = u.UserID
+JOIN COURT c
+ON b.CourtID = c.CourtID
+LEFT JOIN PAYMENT p
+ON b.BookingID = p.BookingID
+WHERE u.UserID = 'U011'
+ORDER BY b.BookingDate, b.StartTime;
+
+
+-- 4C. Alternative: list bookings by email or name directly
+-- This is useful for website users because they may know their email/name,
+-- not their generated Oracle UserID.
+SELECT b.BookingID,
+       u.UserID,
+       u.FullName,
+       u.Email,
+       c.CourtName,
+       b.BookingDate,
+       b.StartTime,
+       b.EndTime,
+       b.BookingStatus,
+       p.PaymentMethod,
+       p.PaymentStatus,
+       p.Amount
+FROM BOOKING b
+JOIN USERS u
+ON b.UserID = u.UserID
+JOIN COURT c
+ON b.CourtID = c.CourtID
+LEFT JOIN PAYMENT p
+ON b.BookingID = p.BookingID
+WHERE LOWER(u.Email) = 'hadikamaluddin@gmail.com'
+   OR LOWER(u.FullName) = 'hadikamaluddin'
+ORDER BY b.BookingDate, b.StartTime;
+
+
+-- 5. Check court availability for a selected date and time
+-- Example: Find badminton court availability on 5 Jan 2026, 08:00 - 10:00.
+SELECT c.CourtID,
+       c.CourtName,
+       ct.TypeName AS CourtType,
+       c.Location,
+       TO_DATE('2026-01-05', 'YYYY-MM-DD') AS SelectedDate,
+       '08:00' AS SelectedStartTime,
+       '10:00' AS SelectedEndTime,
+       CASE
+           WHEN c.CourtStatus <> 'Available' THEN 'Unavailable'
+           WHEN EXISTS
+           (
+               SELECT 1
+               FROM BOOKING b
+               WHERE b.CourtID = c.CourtID
+               AND TRUNC(b.BookingDate) = TO_DATE('2026-01-05', 'YYYY-MM-DD')
+               AND b.BookingStatus IN ('Pending', 'Confirmed')
+               AND '08:00' < b.EndTime
+               AND '10:00' > b.StartTime
+           )
+           THEN 'Unavailable'
+           ELSE 'Available'
+       END AS SlotStatus
+FROM COURT c
+JOIN COURT_TYPE ct
+ON c.CourtTypeID = ct.CourtTypeID
+WHERE ct.TypeName = 'Badminton'
+ORDER BY c.Location, c.CourtName;
+
+
+-- 6. Show available time slots for one court on one date
+-- Example: Check Badminton Court CBM001 on 5 Jan 2026.
+WITH TIME_SLOT AS
+(
+    SELECT '08:00' AS StartTime, '10:00' AS EndTime FROM DUAL
+    UNION ALL
+    SELECT '10:00', '12:00' FROM DUAL
+    UNION ALL
+    SELECT '14:00', '16:00' FROM DUAL
+    UNION ALL
+    SELECT '16:00', '18:00' FROM DUAL
+    UNION ALL
+    SELECT '20:00', '22:00' FROM DUAL
+)
+SELECT c.CourtID,
+       c.CourtName,
+       TO_DATE('2026-01-05', 'YYYY-MM-DD') AS SelectedDate,
+       ts.StartTime,
+       ts.EndTime,
+       CASE
+           WHEN EXISTS
+           (
+               SELECT 1
+               FROM BOOKING b
+               WHERE b.CourtID = c.CourtID
+               AND TRUNC(b.BookingDate) = TO_DATE('2026-01-05', 'YYYY-MM-DD')
+               AND b.BookingStatus IN ('Pending', 'Confirmed')
+               AND ts.StartTime < b.EndTime
+               AND ts.EndTime > b.StartTime
+           )
+           THEN 'Unavailable'
+           ELSE 'Available'
+       END AS SlotStatus
+FROM COURT c
+CROSS JOIN TIME_SLOT ts
+WHERE c.CourtID = 'CBM001'
+ORDER BY ts.StartTime;
+
+
+-- =========================================================
+-- B. INSERT STATEMENTS
+-- =========================================================
+
+-- Clean demo rows first so this script can be run again during presentation.
+DELETE FROM PAYMENT
+WHERE PaymentID = 'P011';
+
+DELETE FROM BOOKING
+WHERE BookingID = 'B011';
+
+DELETE FROM USERS
+WHERE UserID = 'U011';
+
+COMMIT;
+
+
+-- 1. Insert new user
+INSERT INTO USERS
+VALUES ('U011',
+        'Ali Imran',
+        'aliimran@email.com',
+        '0121112233',
+        'pass123');
+
+SELECT *
+FROM USERS
+WHERE UserID = 'U011';
+
+
+-- 2. Insert new booking
+-- Court CBM001 exists. Date 2026-01-10 has no sample booking for this court/time.
+INSERT INTO BOOKING
+VALUES ('B011',
+        'U011',
+        'CBM001',
+        TO_DATE('2026-01-10', 'YYYY-MM-DD'),
+        '08:00',
+        '10:00',
+        'Pending');
+
+SELECT *
+FROM BOOKING
+WHERE BookingID = 'B011';
+
+
+-- 3. Insert payment record for the new booking
+INSERT INTO PAYMENT
+VALUES ('P011',
+        'B011',
+        TO_DATE('2026-01-10', 'YYYY-MM-DD'),
+        20.00,
+        'QR Pay',
+        'Unpaid');
+
+SELECT *
+FROM PAYMENT
+WHERE PaymentID = 'P011';
+
+
+-- =========================================================
+-- C. UPDATE STATEMENTS
+-- =========================================================
+
+-- 1. Update payment status for the new payment
+UPDATE PAYMENT
+SET PaymentStatus = 'Paid'
+WHERE PaymentID = 'P011';
+
+SELECT *
+FROM PAYMENT
+WHERE PaymentID = 'P011';
+
+
+-- 2. Update booking status for the new booking
+UPDATE BOOKING
+SET BookingStatus = 'Confirmed'
+WHERE BookingID = 'B011';
+
+SELECT *
+FROM BOOKING
+WHERE BookingID = 'B011';
+
+
+-- 3. Cancel the booking
+UPDATE BOOKING
+SET BookingStatus = 'Cancelled'
+WHERE BookingID = 'B011';
+
+UPDATE PAYMENT
+SET PaymentStatus = 'Refunded'
+WHERE PaymentID = 'P011';
+
+SELECT b.BookingID,
+       b.BookingStatus,
+       p.PaymentID,
+       p.PaymentMethod,
+       p.PaymentStatus
+FROM BOOKING b
+JOIN PAYMENT p
+ON b.BookingID = p.BookingID
+WHERE b.BookingID = 'B011';
+
+
+-- =========================================================
+-- D. DELETE STATEMENTS
+-- =========================================================
+
+-- Important: delete child table data first because of foreign key relationship.
+
+-- 1. Delete payment first
+DELETE FROM PAYMENT
+WHERE PaymentID = 'P011';
+
+SELECT *
+FROM PAYMENT
+WHERE PaymentID = 'P011';
+
+
+-- 2. Delete booking second
+DELETE FROM BOOKING
+WHERE BookingID = 'B011';
+
+SELECT *
+FROM BOOKING
+WHERE BookingID = 'B011';
+
+
+-- 3. Delete user last
+DELETE FROM USERS
+WHERE UserID = 'U011';
+
+SELECT *
+FROM USERS
+WHERE UserID = 'U011';
+
+COMMIT;
