@@ -42,7 +42,9 @@ def get_connection():
     port = int(os.getenv("ORACLE_PORT", "1521"))
     sid = os.getenv("ORACLE_SID", "xe")
     username = os.getenv("ORACLE_USER", "COURT_APP")
-    password = os.getenv("ORACLE_PASSWORD", "court123")
+    password = os.getenv("ORACLE_PASSWORD")
+    if not password:
+        raise RuntimeError("ORACLE_PASSWORD is not set. Copy backend/.env.example to backend/.env and add your local Oracle password.")
     dsn = oracledb.makedsn(host, port, sid=sid)
     return oracledb.connect(user=username, password=password, dsn=dsn)
 

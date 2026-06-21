@@ -15,6 +15,10 @@ copy .env.example .env
 python app.py
 ```
 
+After copying `.env.example`, open `.env` and replace the placeholder values
+with your own local Oracle username and password. The `.env` file is ignored by
+Git and should not be uploaded.
+
 Open:
 
 ```text
@@ -35,8 +39,8 @@ For Oracle 11g XE:
 Host: localhost
 Port: 1521
 SID: xe
-Username: COURT_APP
-Password: court123
+Username: your_oracle_username
+Password: your_oracle_password
 ```
 
 If the backend cannot find Oracle client libraries, check this folder exists:
